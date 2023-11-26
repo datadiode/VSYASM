@@ -11,16 +11,6 @@ REM Store current directory and ensure working directory is the location of curr
 set CALLDIR=%CD%
 set SCRIPTDIR=%~dp0
 
-REM Initialise error check value
-set ERROR=0
-REM Check if being called from another instance
-if not "%~1"=="" (
-    set MSVC_VER=%~1
-    set ISINSTANCE=1
-    echo Installing VS%~1 customisations into %2
-    goto MSVCCALL
-)
-
 REM Check what architecture we are installing on
 if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
     echo Detected 64 bit system...
@@ -36,6 +26,16 @@ if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 ) else (
     echo Error: Could not detect current platform architecture!"
     goto Terminate
+)
+
+REM Initialise error check value
+set ERROR=0
+REM Check if being called from another instance
+if not "%~1"=="" (
+    set MSVC_VER=%~1
+    set ISINSTANCE=1
+    echo Installing VS%~1 customisations into %2
+    goto MSVCCALL
 )
 
 REM Check if already running in an environment with VS setup
@@ -333,8 +333,7 @@ if not exist "%SCRIPTDIR%\yasm_%YASMVERSION%_win%SYSARCH%.exe" (
 :InstallYASM
 REM copy yasm executable to VC installation folder
 echo Installing required YASM release binary...
-del /F /Q "%VCINSTALLDIR%\yasm.exe" >nul 2>&1
-copy /B /Y /V "%SCRIPTDIR%\yasm*.exe" "%VCINSTALLDIR%\yasm.exe" >nul 2>&1
+copy /B /Y "%SCRIPTDIR%\yasm*.exe" "%VCINSTALLDIR%\yasm.exe" >nul 2>&1
 if %ERRORLEVEL% neq 0 (
     echo Error: Failed to install YASM binary!
     echo    Ensure that this script is run in a shell with the necessary write privileges
